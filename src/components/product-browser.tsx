@@ -34,7 +34,7 @@ type ProductBrowserProps = {
 
 function ProductGridSkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       {Array.from({ length: 8 }).map((_, index) => (
         <div
           key={index}
@@ -185,8 +185,8 @@ export function ProductBrowser({
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-medium text-slate-700">
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-center text-sm font-medium text-slate-700">
             {selectionMode === "quantity"
               ? `${selectedUnitsCount} total items`
               : `${selectedCount} selected`}
@@ -195,7 +195,7 @@ export function ProductBrowser({
             type="button"
             onClick={() => setShowSelectedOnly((current) => !current)}
             className={cn(
-              "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium",
+              "inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-medium",
               showSelectedOnly
                 ? "border-emerald-500 bg-emerald-500 text-white"
                 : "border-white/70 bg-white/80 text-slate-700",
@@ -207,8 +207,8 @@ export function ProductBrowser({
         </div>
       </div>
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <label className="relative block w-full max-w-md">
+      <div className="mt-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <label className="relative block w-full lg:max-w-md">
           <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
           <input
             value={searchInput}
@@ -223,7 +223,7 @@ export function ProductBrowser({
           <span>
             {showSelectedOnly
               ? `${visibleProducts.length} selected products`
-              : `Page ${pageIndex + 1} · 20 per page`}
+              : `Page ${pageIndex + 1} - 20 per page`}
           </span>
         </div>
       </div>
@@ -251,7 +251,7 @@ export function ProductBrowser({
         ) : (
           <motion.div
             layout
-            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
           >
             <AnimatePresence>
               {visibleProducts.map((product) => {
@@ -284,12 +284,12 @@ export function ProductBrowser({
       </div>
 
       {!showSelectedOnly ? (
-        <div className="mt-6 flex items-center justify-between">
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"
             onClick={previousPage}
             disabled={pageIndex === 0 || loading}
-            className="rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-full border border-white/70 bg-white/80 px-4 py-2 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             Previous
           </button>
@@ -298,7 +298,7 @@ export function ProductBrowser({
             type="button"
             onClick={nextPage}
             disabled={!catalog?.pageInfo.hasNextPage || loading}
-            className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-slate-950/10 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-slate-950/10 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             Next
           </button>

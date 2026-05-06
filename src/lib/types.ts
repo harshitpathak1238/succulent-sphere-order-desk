@@ -8,6 +8,7 @@ export type Product = {
   name: string;
   image: string | null;
   price: ProductPrice | null;
+  availableForSale: boolean;
 };
 
 export type ProductsResponse = {

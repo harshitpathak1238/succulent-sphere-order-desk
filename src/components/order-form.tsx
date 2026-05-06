@@ -78,6 +78,10 @@ export function OrderForm() {
         return next;
       }
 
+      if (!product.availableForSale) {
+        return current;
+      }
+
       return {
         ...current,
         [product.id]: {
@@ -90,6 +94,10 @@ export function OrderForm() {
 
   const increaseQuantity = (product: Product) => {
     setSelectedProducts((current) => {
+      if (!product.availableForSale) {
+        return current;
+      }
+
       const entry = current[product.id];
 
       if (!entry) {

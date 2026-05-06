@@ -29,11 +29,11 @@ export function AppNavigation() {
   return (
     <header className="print:hidden">
       <div className="surface-card mt-4 flex flex-col gap-4 rounded-[2rem] border border-white/50 px-4 py-4 sm:mt-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           <div className="flex size-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/25">
             <Leaf className="size-6" />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
               Succulent Sphere
             </p>
@@ -43,7 +43,7 @@ export function AppNavigation() {
           </div>
         </div>
 
-        <nav className="flex flex-wrap items-center gap-2">
+        <nav className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center">
           {links.map((link) => {
             const Icon = link.icon;
             const isActive =
@@ -55,7 +55,7 @@ export function AppNavigation() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium",
+                  "inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-medium",
                   isActive
                     ? "border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
                     : "border-transparent bg-white/70 text-slate-700 hover:border-emerald-100 hover:bg-white",

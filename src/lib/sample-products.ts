@@ -30,6 +30,7 @@ const sampleProducts: Product[] = [
   id: `sample-${index + 1}`,
   name,
   image: "/product-placeholder.svg",
+  availableForSale: (index + 1) % 6 !== 0,
   price: {
     amount: 129 + index * 8,
     currencyCode: "INR",

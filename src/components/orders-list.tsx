@@ -60,7 +60,7 @@ export function OrdersList() {
 
           <Link
             href="/orders/new"
-            className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-950/10"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-950/10 sm:w-auto"
           >
             <FilePlus2 className="size-4" />
             Create Order

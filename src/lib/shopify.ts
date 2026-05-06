@@ -11,6 +11,7 @@ const productQuery = `
         node {
           id
           title
+          availableForSale
           featuredImage {
             url
             altText
@@ -40,6 +41,7 @@ type ShopifyProductsResponse = {
         node: {
           id: string;
           title: string;
+          availableForSale?: boolean | null;
           featuredImage?: {
             url?: string | null;
             altText?: string | null;
@@ -89,6 +91,7 @@ function mapProduct(
     id: node.id,
     name: node.title,
     image: node.featuredImage?.url ?? null,
+    availableForSale: node.availableForSale ?? true,
     price: node.priceRange?.minVariantPrice?.currencyCode
       ? {
           amount,

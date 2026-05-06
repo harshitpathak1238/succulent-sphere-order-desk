@@ -31,6 +31,10 @@ export function DashboardHome() {
         return next;
       }
 
+      if (!product.availableForSale) {
+        return current;
+      }
+
       return {
         ...current,
         [product.id]: {
@@ -74,11 +78,11 @@ export function DashboardHome() {
             designed for speed.
           </p>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <button
               type="button"
               onClick={createOrder}
-              className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-950/10 hover:-translate-y-0.5"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-950/10 hover:-translate-y-0.5 sm:w-auto"
             >
               <PackagePlus className="size-4" />
               {selectedCount > 0
@@ -88,7 +92,7 @@ export function DashboardHome() {
 
             <Link
               href="/orders"
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-5 py-3 text-sm font-semibold text-slate-700 hover:border-emerald-100 hover:bg-white"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/70 px-5 py-3 text-sm font-semibold text-slate-700 hover:border-emerald-100 hover:bg-white sm:w-auto"
             >
               <ClipboardList className="size-4" />
               View Orders
