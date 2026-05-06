@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Download, FilePlus2 } from "lucide-react";
 import {
@@ -8,10 +8,13 @@ import {
   downloadCsv,
   readJsonStorage,
 } from "@/lib/shipping-config";
-import type { SessionOrderRecord } from "@/lib/types";
+import { getFirebaseConfigState } from "@/lib/firebase/config";
+import { getOrders } from "@/lib/firebase/orders";
+import type { OrderRecord, SessionOrderRecord } from "@/lib/types";
 import { formatOrderDate } from "@/lib/utils";
 
 export function OrdersList() {
+  const firebaseReady = getFirebaseConfigState();
   const [orders] = useState<SessionOrderRecord[]>(() =>
     readJsonStorage<SessionOrderRecord[]>(
       SESSION_ORDER_HISTORY_KEY,
@@ -19,6 +22,31 @@ export function OrdersList() {
       "session",
     ),
   );
+  const [legacyOrders, setLegacyOrders] = useState<OrderRecord[]>([]);
+  const [legacyLoading, setLegacyLoading] = useState(firebaseReady);
+  const [legacyError, setLegacyError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!firebaseReady) {
+      return;
+    }
+
+    const loadOrders = async () => {
+      try {
+        const nextOrders = await getOrders();
+        setLegacyOrders(nextOrders);
+        setLegacyError(null);
+      } catch (error) {
+        setLegacyError(
+          error instanceof Error ? error.message : "Unable to load legacy orders.",
+        );
+      } finally {
+        setLegacyLoading(false);
+      }
+    };
+
+    void loadOrders();
+  }, [firebaseReady]);
 
   return (
     <div className="space-y-8">
@@ -29,11 +57,11 @@ export function OrdersList() {
               Orders History
             </p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
-              Orders created in this session.
+              Shipping and legacy orders in one place.
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-              Track created shipments, copy the session as CSV, and keep a quick
-              view of AWB or Pending AWB references.
+              Session shipments from the dashboard and Firebase orders from the
+              Legacy Builder are shown separately below.
             </p>
           </div>
 
@@ -62,6 +90,13 @@ export function OrdersList() {
       </section>
 
       <section className="surface-card overflow-hidden rounded-[2rem] border border-white/60">
+        <div className="border-b border-slate-200/70 px-6 py-5">
+          <p className="text-sm font-semibold text-slate-900">Shipping Dashboard Orders</p>
+          <p className="mt-1 text-sm text-slate-500">
+            Orders created from the main dashboard in this browser session.
+          </p>
+        </div>
+
         {orders.length === 0 ? (
           <div className="p-8 text-sm text-slate-500">
             No session orders yet. Create an order from the dashboard to see it
@@ -109,6 +144,76 @@ export function OrdersList() {
                     <td className="px-4 py-4">{order.status}</td>
                     <td className="px-4 py-4">
                       {formatOrderDate(order.createdAt)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="surface-card overflow-hidden rounded-[2rem] border border-white/60">
+        <div className="border-b border-slate-200/70 px-6 py-5">
+          <p className="text-sm font-semibold text-slate-900">Legacy Builder Orders</p>
+          <p className="mt-1 text-sm text-slate-500">
+            Orders saved by the `/orders/new` flow and loaded from Firebase.
+          </p>
+        </div>
+
+        {!firebaseReady ? (
+          <div className="p-8 text-sm text-slate-500">
+            Firebase is not configured, so legacy orders cannot be loaded.
+          </div>
+        ) : legacyLoading ? (
+          <div className="p-8 text-sm text-slate-500">Loading legacy orders...</div>
+        ) : legacyError ? (
+          <div className="p-8 text-sm text-rose-600">{legacyError}</div>
+        ) : legacyOrders.length === 0 ? (
+          <div className="p-8 text-sm text-slate-500">
+            No legacy orders found yet.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-[760px] w-full text-left text-sm text-slate-700">
+              <thead className="bg-slate-950 text-white">
+                <tr>
+                  {[
+                    "Order ID",
+                    "Customer",
+                    "Payment",
+                    "Items",
+                    "Created At",
+                    "Open",
+                  ].map((heading) => (
+                    <th key={heading} className="px-4 py-4 font-semibold">
+                      {heading}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {legacyOrders.map((order, index) => (
+                  <tr
+                    key={order.id}
+                    className={index % 2 === 0 ? "bg-white/80" : "bg-white/60"}
+                  >
+                    <td className="px-4 py-4 font-semibold text-slate-950">
+                      {order.orderId}
+                    </td>
+                    <td className="px-4 py-4">
+                      {order.customerName || "Walk-in / Not added"}
+                    </td>
+                    <td className="px-4 py-4">{order.paymentType}</td>
+                    <td className="px-4 py-4">{order.totalItems} items</td>
+                    <td className="px-4 py-4">{formatOrderDate(order.createdAt)}</td>
+                    <td className="px-4 py-4">
+                      <Link
+                        href={`/orders/${encodeURIComponent(order.id)}`}
+                        className="font-semibold text-emerald-700 hover:text-emerald-800"
+                      >
+                        View
+                      </Link>
                     </td>
                   </tr>
                 ))}
