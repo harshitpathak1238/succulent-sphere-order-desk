@@ -2,16 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Download, FilePlus2 } from "lucide-react";
+import { Download, FilePlus2, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import {
   SESSION_ORDER_HISTORY_KEY,
   downloadCsv,
   readJsonStorage,
 } from "@/lib/shipping-config";
 import { getFirebaseConfigState } from "@/lib/firebase/config";
-import { getOrders } from "@/lib/firebase/orders";
+import { getOrders, moveOrderToBin } from "@/lib/firebase/orders";
 import type { OrderRecord, SessionOrderRecord } from "@/lib/types";
 import { formatOrderDate } from "@/lib/utils";
+
+type DeleteState = OrderRecord | null;
 
 export function OrdersList() {
   const firebaseReady = getFirebaseConfigState();
@@ -25,6 +29,8 @@ export function OrdersList() {
   const [legacyOrders, setLegacyOrders] = useState<OrderRecord[]>([]);
   const [legacyLoading, setLegacyLoading] = useState(firebaseReady);
   const [legacyError, setLegacyError] = useState<string | null>(null);
+  const [deleteState, setDeleteState] = useState<DeleteState>(null);
+  const [busyOrderId, setBusyOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!firebaseReady) {
@@ -47,6 +53,29 @@ export function OrdersList() {
 
     void loadOrders();
   }, [firebaseReady]);
+
+  const moveToBin = async () => {
+    if (!deleteState) {
+      return;
+    }
+
+    setBusyOrderId(deleteState.id);
+
+    try {
+      await moveOrderToBin(deleteState.id);
+      setLegacyOrders((current) =>
+        current.filter((order) => order.id !== deleteState.id),
+      );
+      toast.success(`Order ${deleteState.orderId} moved to Bin.`);
+      setDeleteState(null);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Unable to move the order to Bin.",
+      );
+    } finally {
+      setBusyOrderId(null);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -184,7 +213,7 @@ export function OrdersList() {
                     "Payment",
                     "Items",
                     "Created At",
-                    "Open",
+                    "Actions",
                   ].map((heading) => (
                     <th key={heading} className="px-4 py-4 font-semibold">
                       {heading}
@@ -208,12 +237,22 @@ export function OrdersList() {
                     <td className="px-4 py-4">{order.totalItems} items</td>
                     <td className="px-4 py-4">{formatOrderDate(order.createdAt)}</td>
                     <td className="px-4 py-4">
-                      <Link
-                        href={`/orders/${encodeURIComponent(order.id)}`}
-                        className="font-semibold text-emerald-700 hover:text-emerald-800"
-                      >
-                        View
-                      </Link>
+                      <div className="flex flex-wrap items-center gap-4">
+                        <Link
+                          href={`/orders/${encodeURIComponent(order.id)}`}
+                          className="font-semibold text-emerald-700 hover:text-emerald-800"
+                        >
+                          View
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteState(order)}
+                          className="inline-flex items-center gap-2 font-semibold text-rose-600 hover:text-rose-700"
+                        >
+                          <Trash2 className="size-4" />
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -222,6 +261,29 @@ export function OrdersList() {
           </div>
         )}
       </section>
+
+      <ConfirmDialog
+        open={deleteState !== null}
+        title="Move this order to Bin?"
+        description={
+          deleteState
+            ? `Order ${deleteState.orderId} will be removed from the active list and saved in Bin for review.`
+            : ""
+        }
+        confirmLabel="Yes"
+        confirmTone="danger"
+        busy={busyOrderId !== null}
+        onCancel={() => {
+          if (busyOrderId) {
+            return;
+          }
+
+          setDeleteState(null);
+        }}
+        onConfirm={() => {
+          void moveToBin();
+        }}
+      />
     </div>
   );
 }

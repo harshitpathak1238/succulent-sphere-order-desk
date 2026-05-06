@@ -49,6 +49,7 @@ export type OrderRecord = {
   items: OrderItem[];
   totalItems: number;
   createdAt: string;
+  deletedAt: string | null;
 };
 
 export type ShippingTarget = "pending_awb_shopify" | "ready_to_ship";

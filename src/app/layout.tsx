@@ -29,9 +29,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${jakarta.variable} ${plexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top_left,_rgba(74,222,128,0.16),_transparent_34%),radial-gradient(circle_at_top_right,_rgba(251,191,36,0.14),_transparent_22%),linear-gradient(180deg,_#f8f4ec_0%,_#f3eee5_100%)]">
+      <body className="app-body min-h-screen overflow-x-hidden">
         <Providers />
         <div className="mx-auto flex min-h-screen w-full max-w-7xl min-w-0 flex-col px-4 pb-12 sm:px-6 lg:px-8">
           <AppNavigation />

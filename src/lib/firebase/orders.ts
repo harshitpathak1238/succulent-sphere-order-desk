@@ -1,12 +1,15 @@
 import {
   Timestamp,
   collection,
+  deleteDoc,
+  deleteField,
   doc,
   getDoc,
   getDocs,
   orderBy,
   query,
   runTransaction,
+  updateDoc,
 } from "firebase/firestore";
 import { getFirestoreDb } from "@/lib/firebase/config";
 import type { CreateOrderInput, OrderItem, OrderRecord } from "@/lib/types";
@@ -23,6 +26,7 @@ function serializeOrderItems(items: OrderItem[]) {
 
 function mapOrderSnapshot(id: string, data: Record<string, unknown>): OrderRecord {
   const createdAt = data.createdAt instanceof Timestamp ? data.createdAt : null;
+  const deletedAt = data.deletedAt instanceof Timestamp ? data.deletedAt : null;
 
   return {
     id,
@@ -34,6 +38,7 @@ function mapOrderSnapshot(id: string, data: Record<string, unknown>): OrderRecor
     createdAt: createdAt
       ? createdAt.toDate().toISOString()
       : new Date().toISOString(),
+    deletedAt: deletedAt ? deletedAt.toDate().toISOString() : null,
   };
 }
 
@@ -92,9 +97,28 @@ export async function getOrders() {
   const ordersQuery = query(collection(db, "orders"), orderBy("createdAt", "desc"));
   const snapshot = await getDocs(ordersQuery);
 
-  return snapshot.docs.map((orderDoc) =>
-    mapOrderSnapshot(orderDoc.id, orderDoc.data() as Record<string, unknown>),
-  );
+  return snapshot.docs
+    .map((orderDoc) =>
+      mapOrderSnapshot(orderDoc.id, orderDoc.data() as Record<string, unknown>),
+    )
+    .filter((order) => order.deletedAt === null);
+}
+
+export async function getDeletedOrders() {
+  const db = getFirestoreDb();
+
+  if (!db) {
+    throw new Error("Firebase is not configured.");
+  }
+
+  const ordersQuery = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+  const snapshot = await getDocs(ordersQuery);
+
+  return snapshot.docs
+    .map((orderDoc) =>
+      mapOrderSnapshot(orderDoc.id, orderDoc.data() as Record<string, unknown>),
+    )
+    .filter((order) => order.deletedAt !== null);
 }
 
 export async function getOrderById(orderDocumentId: string) {
@@ -114,4 +138,38 @@ export async function getOrderById(orderDocumentId: string) {
     snapshot.id,
     snapshot.data() as Record<string, unknown>,
   );
+}
+
+export async function moveOrderToBin(orderDocumentId: string) {
+  const db = getFirestoreDb();
+
+  if (!db) {
+    throw new Error("Firebase is not configured.");
+  }
+
+  await updateDoc(doc(db, "orders", orderDocumentId), {
+    deletedAt: Timestamp.now(),
+  });
+}
+
+export async function restoreOrderFromBin(orderDocumentId: string) {
+  const db = getFirestoreDb();
+
+  if (!db) {
+    throw new Error("Firebase is not configured.");
+  }
+
+  await updateDoc(doc(db, "orders", orderDocumentId), {
+    deletedAt: deleteField(),
+  });
+}
+
+export async function permanentlyDeleteOrder(orderDocumentId: string) {
+  const db = getFirestoreDb();
+
+  if (!db) {
+    throw new Error("Firebase is not configured.");
+  }
+
+  await deleteDoc(doc(db, "orders", orderDocumentId));
 }

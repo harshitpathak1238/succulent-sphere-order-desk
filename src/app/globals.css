@@ -6,6 +6,22 @@
   --surface: rgba(255, 252, 247, 0.82);
   --surface-strong: #fffdf9;
   --border-soft: rgba(20, 33, 43, 0.08);
+  --page-background:
+    radial-gradient(circle at top left, rgba(74, 222, 128, 0.16), transparent 34%),
+    radial-gradient(circle at top right, rgba(251, 191, 36, 0.14), transparent 22%),
+    linear-gradient(180deg, #f8f4ec 0%, #f3eee5 100%);
+}
+
+html[data-theme="dark"] {
+  --background: #0e1720;
+  --foreground: #edf4fb;
+  --surface: rgba(17, 26, 36, 0.82);
+  --surface-strong: #172331;
+  --border-soft: rgba(226, 232, 240, 0.12);
+  --page-background:
+    radial-gradient(circle at top left, rgba(16, 185, 129, 0.14), transparent 30%),
+    radial-gradient(circle at top right, rgba(249, 115, 22, 0.14), transparent 20%),
+    linear-gradient(180deg, #09111a 0%, #101a25 100%);
 }
 
 @theme inline {
@@ -27,6 +43,10 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-plus-jakarta-sans), sans-serif;
+}
+
+.app-body {
+  background: var(--page-background);
 }
 
 a,
@@ -65,6 +85,52 @@ textarea {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+html[data-theme="dark"] .surface-card,
+html[data-theme="dark"] .surface-card-strong {
+  border-color: rgba(226, 232, 240, 0.08);
+  box-shadow:
+    0 20px 48px rgba(2, 6, 23, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme="dark"] .text-slate-950,
+html[data-theme="dark"] .text-slate-900,
+html[data-theme="dark"] .text-slate-700 {
+  color: #edf4fb !important;
+}
+
+html[data-theme="dark"] .text-slate-600,
+html[data-theme="dark"] .text-slate-500 {
+  color: #aac0d5 !important;
+}
+
+html[data-theme="dark"] .bg-white\/85,
+html[data-theme="dark"] .bg-white\/80,
+html[data-theme="dark"] .bg-white\/70,
+html[data-theme="dark"] .bg-white\/60 {
+  background-color: rgba(19, 29, 40, 0.88) !important;
+}
+
+html[data-theme="dark"] .bg-emerald-50\/80 {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+}
+
+html[data-theme="dark"] .bg-rose-50\/80 {
+  background-color: rgba(244, 63, 94, 0.12) !important;
+}
+
+html[data-theme="dark"] .border-white\/60,
+html[data-theme="dark"] .border-white\/70,
+html[data-theme="dark"] .border-slate-200\/70,
+html[data-theme="dark"] .border-slate-200\/80,
+html[data-theme="dark"] .border-slate-300 {
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html[data-theme="dark"] .bg-slate-50 {
+  background-color: rgba(30, 41, 59, 0.7) !important;
 }
 
 @media print {
