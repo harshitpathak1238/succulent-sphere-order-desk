@@ -9,6 +9,7 @@ import {
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Filter, Loader2, Search } from "lucide-react";
+import { PRODUCTS_PER_PAGE } from "@/lib/constants";
 import { ProductCard } from "@/components/product-card";
 import { GIFT_PRODUCT } from "@/lib/gift-product";
 import type { Product, ProductsResponse } from "@/lib/types";
@@ -238,7 +239,7 @@ export function ProductBrowser({
           <span>
             {showSelectedOnly
               ? `${visibleProducts.length} selected products`
-              : `Page ${pageIndex + 1} - ${catalog?.products.length ?? 0} products + gift`}
+              : `Page ${pageIndex + 1} - ${PRODUCTS_PER_PAGE} per page + gift`}
           </span>
         </div>
       </div>
