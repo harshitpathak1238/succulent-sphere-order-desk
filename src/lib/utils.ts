@@ -55,7 +55,7 @@ export function buildPackingSlip(order: OrderRecord) {
     (item, index) => `${index + 1}. ${item.productName} x ${item.quantity}`,
   );
 
-  return [...header, ...items, "", `Total: ${order.totalItems} plants`].join(
+  return [...header, ...items, "", `Total: ${order.totalItems} items`].join(
     "\n",
   );
 }

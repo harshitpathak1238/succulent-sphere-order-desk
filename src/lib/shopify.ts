@@ -92,6 +92,7 @@ function mapProduct(
     name: node.title,
     image: node.featuredImage?.url ?? null,
     availableForSale: node.availableForSale ?? true,
+    kind: "catalog",
     price: node.priceRange?.minVariantPrice?.currencyCode
       ? {
           amount,

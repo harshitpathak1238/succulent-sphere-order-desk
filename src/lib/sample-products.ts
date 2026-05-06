@@ -31,6 +31,7 @@ const sampleProducts: Product[] = [
   name,
   image: "/product-placeholder.svg",
   availableForSale: (index + 1) % 6 !== 0,
+  kind: "catalog",
   price: {
     amount: 129 + index * 8,
     currencyCode: "INR",

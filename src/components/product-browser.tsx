@@ -10,6 +10,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { Filter, Loader2, Search } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
+import { GIFT_PRODUCT } from "@/lib/gift-product";
 import type { Product, ProductsResponse } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -138,9 +139,23 @@ export function ProductBrowser({
     [selectedProducts],
   );
 
-  const visibleProducts = showSelectedOnly
-    ? selectedProductsList
-    : (catalog?.products ?? []);
+  const visibleProducts = useMemo(() => {
+    if (showSelectedOnly) {
+      const selectedGift = selectedProductsList.find(
+        (product) => product.id === GIFT_PRODUCT.id,
+      );
+      const selectedCatalogProducts = selectedProductsList.filter(
+        (product) => product.id !== GIFT_PRODUCT.id,
+      );
+
+      return selectedGift
+        ? [selectedGift, ...selectedCatalogProducts]
+        : selectedCatalogProducts;
+    }
+
+    const catalogProducts = catalog?.products ?? [];
+    return [GIFT_PRODUCT, ...catalogProducts];
+  }, [catalog?.products, selectedProductsList, showSelectedOnly]);
 
   const selectedCount = selectedProductsList.length;
 
@@ -223,7 +238,7 @@ export function ProductBrowser({
           <span>
             {showSelectedOnly
               ? `${visibleProducts.length} selected products`
-              : `Page ${pageIndex + 1} - 20 per page`}
+              : `Page ${pageIndex + 1} - ${catalog?.products.length ?? 0} products + gift`}
           </span>
         </div>
       </div>

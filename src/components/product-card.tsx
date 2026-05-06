@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
+import { useState, type KeyboardEvent } from "react";
 import { motion } from "framer-motion";
 import { Check, Minus, Plus } from "lucide-react";
 import type { Product } from "@/lib/types";
@@ -29,6 +29,7 @@ export function ProductCard({
   const [blockedTapCount, setBlockedTapCount] = useState(0);
   const formattedPrice = formatCurrency(product.price);
   const outOfStock = !product.availableForSale;
+  const isGift = product.kind === "gift";
 
   const handleCardClick = () => {
     if (outOfStock && !selected) {
@@ -39,10 +40,20 @@ export function ProductCard({
     onToggle();
   };
 
+  const handleCardKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    handleCardClick();
+  };
+
   return (
-    <motion.button
+    <motion.div
       layout
-      type="button"
+      role="button"
+      tabIndex={0}
       whileHover={outOfStock ? undefined : { y: -4 }}
       whileTap={{ scale: 0.985 }}
       animate={
@@ -52,7 +63,9 @@ export function ProductCard({
       }
       transition={{ duration: 0.34, ease: "easeInOut" }}
       onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
       aria-disabled={outOfStock && !selected}
+      aria-pressed={selected}
       className={cn(
         "surface-card-strong group relative overflow-hidden rounded-[1.6rem] border p-2.5 text-left sm:rounded-[2rem] sm:p-3",
         outOfStock && !selected && "cursor-not-allowed",
@@ -104,6 +117,10 @@ export function ProductCard({
             )}
           >
             {formattedPrice}
+          </p>
+        ) : isGift ? (
+          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700 sm:text-sm sm:tracking-[0.22em]">
+            Complimentary add-on
           </p>
         ) : (
           <p className="mt-1 text-xs text-slate-400 sm:text-sm">Price hidden</p>
@@ -170,6 +187,6 @@ export function ProductCard({
           </div>
         ) : null}
       </div>
-    </motion.button>
+    </motion.div>
   );
 }

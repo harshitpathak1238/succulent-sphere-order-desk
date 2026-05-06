@@ -204,7 +204,7 @@ export function OrderDetail({ orderDocumentId }: OrderDetailProps) {
         <div className="mt-8 flex items-center justify-between border-t border-slate-200/70 pt-6">
           <p className="text-lg font-semibold text-slate-600">Total</p>
           <p className="text-2xl font-semibold text-slate-950">
-            {order.totalItems} plants
+            {order.totalItems} items
           </p>
         </div>
       </motion.section>

@@ -9,6 +9,7 @@ export type Product = {
   image: string | null;
   price: ProductPrice | null;
   availableForSale: boolean;
+  kind?: "catalog" | "gift";
 };
 
 export type ProductsResponse = {
