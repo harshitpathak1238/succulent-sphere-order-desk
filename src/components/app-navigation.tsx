@@ -2,18 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FilePlus2, Leaf, PackageSearch } from "lucide-react";
+import { FilePlus2, LayoutDashboard, PackageSearch } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
   {
     href: "/",
-    label: "Products",
-    icon: Leaf,
+    label: "Dashboard",
+    icon: LayoutDashboard,
   },
   {
     href: "/orders/new",
-    label: "Create Order",
+    label: "Legacy Builder",
     icon: FilePlus2,
   },
   {
@@ -31,7 +31,7 @@ export function AppNavigation() {
       <div className="surface-card mt-4 flex flex-col gap-4 rounded-[2rem] border border-white/50 px-4 py-4 sm:mt-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex size-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/25">
-            <Leaf className="size-6" />
+            <LayoutDashboard className="size-6" />
           </div>
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">

@@ -11,10 +11,18 @@ const productQuery = `
         node {
           id
           title
+          productType
           availableForSale
           featuredImage {
             url
             altText
+          }
+          variants(first: 1) {
+            edges {
+              node {
+                sku
+              }
+            }
           }
           priceRange {
             minVariantPrice {
@@ -41,10 +49,18 @@ type ShopifyProductsResponse = {
         node: {
           id: string;
           title: string;
+          productType?: string | null;
           availableForSale?: boolean | null;
           featuredImage?: {
             url?: string | null;
             altText?: string | null;
+          } | null;
+          variants?: {
+            edges: Array<{
+              node: {
+                sku?: string | null;
+              };
+            }>;
           } | null;
           priceRange?: {
             minVariantPrice?: {
@@ -93,6 +109,8 @@ function mapProduct(
     image: node.featuredImage?.url ?? null,
     availableForSale: node.availableForSale ?? true,
     kind: "catalog",
+    sku: node.variants?.edges[0]?.node.sku ?? null,
+    category: node.productType?.trim() || "Plants",
     price: node.priceRange?.minVariantPrice?.currencyCode
       ? {
           amount,

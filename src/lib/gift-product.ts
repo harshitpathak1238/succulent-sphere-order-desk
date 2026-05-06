@@ -9,4 +9,6 @@ export const GIFT_PRODUCT: Product = {
   price: null,
   availableForSale: true,
   kind: "gift",
+  sku: "GIFT-001",
+  category: "Gift",
 };

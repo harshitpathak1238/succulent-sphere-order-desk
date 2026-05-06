@@ -32,6 +32,8 @@ const sampleProducts: Product[] = [
   image: "/product-placeholder.svg",
   availableForSale: (index + 1) % 6 !== 0,
   kind: "catalog",
+  sku: `SS-${1001 + index}`,
+  category: "Plants",
   price: {
     amount: 129 + index * 8,
     currencyCode: "INR",

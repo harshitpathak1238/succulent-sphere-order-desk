@@ -1,45 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight, FilePlus2, Loader2 } from "lucide-react";
-import { getFirebaseConfigState } from "@/lib/firebase/config";
-import { getOrders } from "@/lib/firebase/orders";
-import type { OrderRecord } from "@/lib/types";
+import { Download, FilePlus2 } from "lucide-react";
+import {
+  SESSION_ORDER_HISTORY_KEY,
+  downloadCsv,
+  readJsonStorage,
+} from "@/lib/shipping-config";
+import type { SessionOrderRecord } from "@/lib/types";
 import { formatOrderDate } from "@/lib/utils";
 
 export function OrdersList() {
-  const firebaseReady = getFirebaseConfigState();
-  const [orders, setOrders] = useState<OrderRecord[]>([]);
-  const [loading, setLoading] = useState(firebaseReady);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!firebaseReady) {
-      return;
-    }
-
-    const loadOrders = async () => {
-      setLoading(true);
-
-      try {
-        const nextOrders = await getOrders();
-        setOrders(nextOrders);
-        setError(null);
-      } catch (loadError) {
-        setError(
-          loadError instanceof Error
-            ? loadError.message
-            : "Unable to load orders.",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void loadOrders();
-  }, [firebaseReady]);
+  const [orders] = useState<SessionOrderRecord[]>(() =>
+    readJsonStorage<SessionOrderRecord[]>(
+      SESSION_ORDER_HISTORY_KEY,
+      [],
+      "session",
+    ),
+  );
 
   return (
     <div className="space-y-8">
@@ -47,81 +26,95 @@ export function OrdersList() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-700">
-              Orders List
+              Orders History
             </p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
-              All saved orders in one clean queue.
+              Orders created in this session.
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-              Open any order to copy a packing slip, print it, or double-check
-              the items before dispatch.
+              Track created shipments, copy the session as CSV, and keep a quick
+              view of AWB or Pending AWB references.
             </p>
           </div>
 
-          <Link
-            href="/orders/new"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-950/10 sm:w-auto"
-          >
-            <FilePlus2 className="size-4" />
-            Create Order
-          </Link>
-        </div>
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <button
+              type="button"
+              onClick={() =>
+                downloadCsv(orders, `session-orders-${new Date().toISOString()}.csv`)
+              }
+              disabled={orders.length === 0}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/70 bg-white/85 px-5 py-3 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            >
+              <Download className="size-4" />
+              Download CSV
+            </button>
 
-        {!firebaseReady ? (
-          <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50/90 px-4 py-3 text-sm text-amber-900">
-            Add your Firebase env values to load live orders from Firestore.
+            <Link
+              href="/"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-950/10 sm:w-auto"
+            >
+              <FilePlus2 className="size-4" />
+              Create Order
+            </Link>
           </div>
-        ) : null}
+        </div>
       </section>
 
-      <section className="space-y-4">
-        {loading ? (
-          <div className="surface-card rounded-[2rem] border border-white/60 p-8 text-sm text-slate-500">
-            <div className="flex items-center gap-3">
-              <Loader2 className="size-4 animate-spin" />
-              Loading orders...
-            </div>
-          </div>
-        ) : error ? (
-          <div className="rounded-[2rem] border border-rose-200 bg-rose-50/90 p-6 text-sm text-rose-700">
-            {error}
-          </div>
-        ) : orders.length === 0 ? (
-          <div className="surface-card rounded-[2rem] border border-white/60 p-8 text-sm text-slate-500">
-            No orders yet. Create your first order to start building the packing
-            history.
+      <section className="surface-card overflow-hidden rounded-[2rem] border border-white/60">
+        {orders.length === 0 ? (
+          <div className="p-8 text-sm text-slate-500">
+            No session orders yet. Create an order from the dashboard to see it
+            here.
           </div>
         ) : (
-          orders.map((order, index) => (
-            <motion.div
-              key={order.id}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.04 }}
-            >
-              <Link
-                href={`/orders/${encodeURIComponent(order.id)}`}
-                className="surface-card block rounded-[2rem] border border-white/60 p-5 hover:-translate-y-0.5"
-              >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold text-slate-950">
-                      Order #{order.orderId}
-                    </h3>
-                    <p className="mt-1 text-sm text-slate-600">
-                      {order.paymentType} | {order.totalItems} items |{" "}
+          <div className="overflow-x-auto">
+            <table className="min-w-[980px] w-full text-left text-sm text-slate-700">
+              <thead className="bg-slate-950 text-white">
+                <tr>
+                  {[
+                    "Order ID",
+                    "Customer",
+                    "Pincode",
+                    "Product",
+                    "Amount",
+                    "Payment",
+                    "AWB Number",
+                    "Status",
+                    "Created At",
+                  ].map((heading) => (
+                    <th key={heading} className="px-4 py-4 font-semibold">
+                      {heading}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((order, index) => (
+                  <tr
+                    key={order.id}
+                    className={index % 2 === 0 ? "bg-white/80" : "bg-white/60"}
+                  >
+                    <td className="px-4 py-4 font-semibold text-slate-950">
+                      {order.orderId}
+                    </td>
+                    <td className="px-4 py-4">{order.customerName}</td>
+                    <td className="px-4 py-4">{order.pincode}</td>
+                    <td className="max-w-xs px-4 py-4">{order.productSummary}</td>
+                    <td className="px-4 py-4">₹{order.amount.toFixed(2)}</td>
+                    <td className="px-4 py-4">{order.payment}</td>
+                    <td className="px-4 py-4">
+                      {order.awbNumber || "Pending"}
+                    </td>
+                    <td className="px-4 py-4">{order.status}</td>
+                    <td className="px-4 py-4">
                       {formatOrderDate(order.createdAt)}
-                    </p>
-                  </div>
-
-                  <div className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700">
-                    Open packing slip
-                    <ArrowRight className="size-4" />
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
     </div>
