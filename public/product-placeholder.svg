@@ -1,0 +1,26 @@
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1200" rx="64" fill="#E9E2D6"/>
+  <rect x="130" y="78" width="940" height="1044" rx="40" fill="url(#bg)"/>
+  <ellipse cx="600" cy="924" rx="272" ry="64" fill="#D2C7B7"/>
+  <path d="M410 782C424 682 493 638 600 638C707 638 776 682 790 782L822 962H378L410 782Z" fill="#FCFBF7"/>
+  <ellipse cx="600" cy="777" rx="216" ry="58" fill="#F0EBE3"/>
+  <ellipse cx="600" cy="772" rx="196" ry="46" fill="#A39267"/>
+  <circle cx="600" cy="548" r="72" fill="#6A925D"/>
+  <path d="M600 320C644 394 654 452 600 548C546 452 556 394 600 320Z" fill="#8CB180"/>
+  <path d="M724 376C730 460 704 515 624 580C608 486 630 430 724 376Z" fill="#7FA86F"/>
+  <path d="M476 376C570 430 592 486 576 580C496 515 470 460 476 376Z" fill="#7CA06E"/>
+  <path d="M792 474C782 556 736 604 650 636C662 544 706 498 792 474Z" fill="#729A66"/>
+  <path d="M408 474C494 498 538 544 550 636C464 604 418 556 408 474Z" fill="#769C68"/>
+  <path d="M774 580C744 648 686 690 612 704C642 626 698 586 774 580Z" fill="#86AE76"/>
+  <path d="M426 580C502 586 558 626 588 704C514 690 456 648 426 580Z" fill="#8DB581"/>
+  <path d="M688 258C712 334 694 394 628 450C608 378 626 320 688 258Z" fill="#709664"/>
+  <path d="M512 258C574 320 592 378 572 450C506 394 488 334 512 258Z" fill="#739968"/>
+  <path d="M862 612C822 664 760 694 690 694C726 630 784 596 862 612Z" fill="#6D955F"/>
+  <path d="M338 612C416 596 474 630 510 694C440 694 378 664 338 612Z" fill="#759C68"/>
+  <defs>
+    <linearGradient id="bg" x1="600" y1="78" x2="600" y2="1122" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D8D4C9"/>
+      <stop offset="1" stop-color="#ECE6DA"/>
+    </linearGradient>
+  </defs>
+</svg>
